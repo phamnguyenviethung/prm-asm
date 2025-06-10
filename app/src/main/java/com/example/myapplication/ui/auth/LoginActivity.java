@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,8 +14,10 @@ import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.api.AuthService;
 import com.example.myapplication.config.ApiClient;
+import com.example.myapplication.dto.ErrorResponse;
 import com.example.myapplication.dto.LoginRequest;
 import com.example.myapplication.dto.LoginResponse;
+import com.example.myapplication.util.ErrorUtils;
 import com.example.myapplication.util.TokenManager;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -93,7 +94,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 setLoading(false);
-                showError("Network error: " + t.getMessage());
+                String errorMessage = ErrorUtils.handleThrowable(t);
+                showError(errorMessage);
+                Log.e("LoginActivity", "Network error", t);
             }
         });
     }
@@ -113,7 +116,9 @@ public class LoginActivity extends AppCompatActivity {
         if (response.code() == 401) {
             showError("Invalid email or password");
         } else {
-            showError("Login failed: " + response.message());
+            ErrorResponse errorResponse = ErrorUtils.processError(response);
+            showError("Login failed: " + errorResponse.getError());
+            Log.e("LoginActivity", "Error: " + errorResponse.getError());
         }
     }
 
