@@ -1,7 +1,7 @@
 package com.example.myapplication.util;
 
 
-import com.example.myapplication.dto.ErrorResponse;
+import com.example.myapplication.dto.response.ErrorResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 

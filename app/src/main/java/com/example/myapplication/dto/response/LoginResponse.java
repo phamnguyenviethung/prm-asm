@@ -1,4 +1,4 @@
-package com.example.myapplication.dto;
+package com.example.myapplication.dto.response;
 
 public class LoginResponse {
     private String accessToken;

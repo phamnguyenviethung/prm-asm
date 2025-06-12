@@ -1,7 +1,7 @@
 package com.example.myapplication.api;
 
-import com.example.myapplication.dto.LoginRequest;
-import com.example.myapplication.dto.LoginResponse;
+import com.example.myapplication.dto.request.LoginRequest;
+import com.example.myapplication.dto.response.LoginResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
