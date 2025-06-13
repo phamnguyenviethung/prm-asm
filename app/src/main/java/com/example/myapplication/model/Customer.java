@@ -4,9 +4,26 @@ public class Customer {
     private String id;
     private String fullName;
     private String email;
-    private int role;
+    private String phone;
+    private String streetAddress;
+    private String province;
+    private String district;
+    private String role;
 
+    public Customer() {
+    }
 
+    public Customer(String id, String fullName, String email, String phone, String streetAddress, String province,
+                    String district, String role) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.phone = phone;
+        this.streetAddress = streetAddress;
+        this.province = province;
+        this.district = district;
+        this.role = role;
+    }
 
     public String getId() {
         return id;
@@ -32,11 +49,43 @@ public class Customer {
         this.email = email;
     }
 
-    public int getRole() {
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getStreetAddress() {
+        return streetAddress;
+    }
+
+    public void setStreetAddress(String streetAddress) {
+        this.streetAddress = streetAddress;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(String role) {
         this.role = role;
     }
 }

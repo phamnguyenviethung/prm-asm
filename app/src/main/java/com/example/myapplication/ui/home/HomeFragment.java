@@ -17,6 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.myapplication.databinding.FragmentHomeBinding;
 import com.example.myapplication.model.Product;
+import com.example.myapplication.util.AuthManager;
 
 public class HomeFragment extends Fragment implements ProductAdapter.OnProductClickListener {
 
@@ -30,6 +31,9 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        // Check if user is logged in
+        AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
+
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -58,7 +62,13 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     private void setupSwipeRefresh() {
         swipeRefresh.setOnRefreshListener(() -> {
-            homeViewModel.loadProducts();
+            // Check if user is still logged in before refreshing
+            if (AuthManager.getInstance(requireContext()).isLoggedIn()) {
+                homeViewModel.loadProducts();
+            } else {
+                swipeRefresh.setRefreshing(false);
+                AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
+            }
         });
     }
 
@@ -106,8 +116,13 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     @Override
     public void onProductClick(Product product) {
-        Toast.makeText(getContext(), "Product clicked: " + product.getName(), Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to product details page
+        // Check if user is still logged in before handling click
+        if (AuthManager.getInstance(requireContext()).isLoggedIn()) {
+            Toast.makeText(getContext(), "Product clicked: " + product.getName(), Toast.LENGTH_SHORT).show();
+            // TODO: Navigate to product details page
+        } else {
+            AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
+        }
     }
 
     @Override
