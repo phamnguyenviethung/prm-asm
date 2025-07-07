@@ -34,7 +34,20 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        
+        // Handle bottom navigation with custom listener to clear back stack
+        navView.setOnItemSelectedListener(item -> {
+            // Clear back stack and navigate to the selected destination
+            navController.popBackStack(navController.getGraph().getStartDestinationId(), false);
+            return NavigationUI.onNavDestinationSelected(item, navController);
+        });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        return navController.navigateUp() || super.onSupportNavigateUp();
     }
 
 }
+

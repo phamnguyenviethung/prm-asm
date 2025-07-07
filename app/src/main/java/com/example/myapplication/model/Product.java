@@ -8,16 +8,16 @@ public class Product {
     private String thumbnail;
     private String handle;
     private String vendor;
-    private double startingPrice;
-    private double maxPrice;
-    private double finalStartingPrice;
-    private double finalMaxPrice;
+    private int startingPrice;
+    private int maxPrice;
+    private int finalStartingPrice;
+    private int finalMaxPrice;
 
 
     public Product() {
     }
 
-    public Product(String id, String name, String thumbnail, String handle, String vendor, double startingPrice, double maxPrice, double finalStartingPrice, double finalMaxPrice) {
+    public Product(String id, String name, String thumbnail, String handle, String vendor, int startingPrice, int maxPrice, int finalStartingPrice, int finalMaxPrice) {
         this.id = id;
         this.name = name;
         this.thumbnail = thumbnail;
@@ -69,35 +69,35 @@ public class Product {
         this.vendor = vendor;
     }
 
-    public double getStartingPrice() {
+    public int getStartingPrice() {
         return startingPrice;
     }
 
-    public void setStartingPrice(double startingPrice) {
+    public void setStartingPrice(int startingPrice) {
         this.startingPrice = startingPrice;
     }
 
-    public double getMaxPrice() {
+    public int getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(double maxPrice) {
+    public void setMaxPrice(int maxPrice) {
         this.maxPrice = maxPrice;
     }
 
-    public double getFinalStartingPrice() {
+    public int getFinalStartingPrice() {
         return finalStartingPrice;
     }
 
-    public void setFinalStartingPrice(double finalStartingPrice) {
+    public void setFinalStartingPrice(int finalStartingPrice) {
         this.finalStartingPrice = finalStartingPrice;
     }
 
-    public double getFinalMaxPrice() {
+    public int getFinalMaxPrice() {
         return finalMaxPrice;
     }
 
-    public void setFinalMaxPrice(double finalMaxPrice) {
+    public void setFinalMaxPrice(int finalMaxPrice) {
         this.finalMaxPrice = finalMaxPrice;
     }
 }
