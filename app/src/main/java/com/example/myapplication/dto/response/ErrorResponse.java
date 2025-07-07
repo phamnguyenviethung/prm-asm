@@ -3,30 +3,22 @@ package com.example.myapplication.dto.response;
 import com.google.gson.annotations.SerializedName;
 
 public class ErrorResponse {
-
     @SerializedName("error")
     private String error;
 
-    @SerializedName("title")
-    private String title;
+    @SerializedName("isSuccess")
+    private boolean isSuccess;
 
-
-    public ErrorResponse(String error) {
+    @SerializedName("isFailure")
+    private boolean isFailure;
+    
+    public ErrorResponse(String error,  boolean isSuccess, boolean isFailure) {
         this.error = error;
-
-    }
-
-    public ErrorResponse(String error, String title) {
-        this.error = error;
-        this.title = title;
+        this.isSuccess = isSuccess;
+        this.isFailure = isFailure;
     }
 
     public String getError() {
-
-        if (this.error == null || this.error.isEmpty()) {
-            return this.title;
-        }
-
         return error;
     }
 
@@ -34,7 +26,19 @@ public class ErrorResponse {
         this.error = error;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public boolean isSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(boolean success) {
+        isSuccess = success;
+    }
+
+    public boolean isFailure() {
+        return isFailure;
+    }
+
+    public void setFailure(boolean failure) {
+        isFailure = failure;
     }
 }

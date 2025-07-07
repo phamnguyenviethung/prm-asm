@@ -50,7 +50,7 @@ public class ErrorUtils {
 
 
     private static ErrorResponse createDefaultError(String errorMessage) {
-        return new ErrorResponse(errorMessage);
+        return new ErrorResponse(errorMessage, false, true);
     }
 
 
