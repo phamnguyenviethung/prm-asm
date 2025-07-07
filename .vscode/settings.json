@@ -1,0 +1,10 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "android.adbPath": "adb",
+    "android.emulatorPath": "emulator",
+    "android.sdkPath": "${env:ANDROID_HOME}",
+    "files.associations": {
+        "*.xml": "xml"
+    },
+    "java.compile.nullAnalysis.mode": "automatic"
+}
