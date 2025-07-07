@@ -68,24 +68,38 @@ public class ProductOptionAdapter extends RecyclerView.Adapter<ProductOptionAdap
 
         public void bind(VariantOption option) {
             tvOptionName.setText(option.getName() + ":");
-            
+
             // Clear previous chips
             chipGroupValues.removeAllViews();
-            
+
+            // Set single selection mode for chip group
+            chipGroupValues.setSingleSelection(true);
+
             // Add chips for each value
             for (VariantValue value : option.getValues()) {
                 Chip chip = new Chip(context);
                 chip.setText(value.getValue());
                 chip.setCheckable(true);
-
-                chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    if (isChecked && listener != null) {
-                        listener.onOptionSelected(option.getId(), value.getId());
-                    }
-                });
+                chip.setId(View.generateViewId()); // Generate unique ID for each chip
 
                 chipGroupValues.addView(chip);
             }
+
+            // Set listener for chip group selection
+            chipGroupValues.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (!checkedIds.isEmpty() && listener != null) {
+                    int checkedId = checkedIds.get(0);
+                    Chip selectedChip = group.findViewById(checkedId);
+                    if (selectedChip != null) {
+                        // Find the corresponding value ID
+                        int chipIndex = group.indexOfChild(selectedChip);
+                        if (chipIndex >= 0 && chipIndex < option.getValues().size()) {
+                            VariantValue selectedValue = option.getValues().get(chipIndex);
+                            listener.onOptionSelected(option.getId(), selectedValue.getId());
+                        }
+                    }
+                }
+            });
         }
     }
 }

@@ -14,4 +14,38 @@ public class VariantDetail {
 
     public VariantDetail() {
     }
+
+    // Getter methods
+    public String getOptionId() {
+        return optionId;
+    }
+
+    public String getOptionName() {
+        return optionName;
+    }
+
+    public String getValueId() {
+        return valueId;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    // Setter methods
+    public void setOptionId(String optionId) {
+        this.optionId = optionId;
+    }
+
+    public void setOptionName(String optionName) {
+        this.optionName = optionName;
+    }
+
+    public void setValueId(String valueId) {
+        this.valueId = valueId;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

@@ -17,4 +17,46 @@ public class GetCartResponse {
     }
     public GetCartResponse() {
     }
+
+    // Getter methods
+    public String getUserId() {
+        return userId;
+    }
+
+    public boolean isRequiresShipping() {
+        return requiresShipping;
+    }
+
+    public ArrayList<CartItem> getItems() {
+        return items;
+    }
+
+    public int getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+
+    // Setter methods
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setRequiresShipping(boolean requiresShipping) {
+        this.requiresShipping = requiresShipping;
+    }
+
+    public void setItems(ArrayList<CartItem> items) {
+        this.items = items;
+    }
+
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }

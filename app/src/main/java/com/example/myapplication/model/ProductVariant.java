@@ -5,151 +5,205 @@ import java.util.List;
 
 public class ProductVariant {
     private String id;
-    private String name;
-    private String description;
-    private String promotionDescription;
-    private Integer soldQuantity;
-    private String categoryId;
-    private String categoryName;
-    private String status;
-    private String thumbnail;
-    private String vendor;
-    private String handle;
-    private boolean available;
+    private String sku;
+    private int price;
+    private int finalPrice;
+    private int originalPrice;
+    private int weight;
+    private boolean requiresShipping;
     private boolean notAllowPromotion;
-    private List<ProductImage> images = new ArrayList<>();
-    private List<ProductVariant> variants = new ArrayList<>();
-    private List<VariantOption> options = new ArrayList<>();
-    private int startingPrice;
-    private int maxPrice;
-    private int promotionSale;
+    private String metadata;
+    private String barcode;
+    private int position;
+    private String imageId;
+    private String productId;
     private int totalQuantity;
-    private int reservedQuantity;
     private int availableQuantity;
+    private int reservedQuantity;
+    private int soldQuantity;
+    private List<VariantDetail> optionValues = new ArrayList<>();
     
-    // Calculated properties
-    public int getFinalStartingPrice() {
-        return startingPrice - promotionSale;
-    }
-    
-    public int getFinalMaxPrice() {
-        return maxPrice - promotionSale;
-    }
-
     public ProductVariant() {
     }
-
+    
+    public ProductVariant(String id, String sku, int price, int finalPrice, int originalPrice, int weight, boolean requiresShipping, boolean notAllowPromotion, String metadata, String barcode, int position, String imageId, String productId, int totalQuantity, int availableQuantity, int reservedQuantity, int soldQuantity, List<VariantDetail> optionValues) {
+        this.id = id;
+        this.sku = sku;
+        this.price = price;
+        this.finalPrice = finalPrice;
+        this.originalPrice = originalPrice;
+        this.weight = weight;
+        this.requiresShipping = requiresShipping;
+        this.notAllowPromotion = notAllowPromotion;
+        this.metadata = metadata;
+        this.barcode = barcode;
+        this.position = position;
+        this.imageId = imageId;
+        this.productId = productId;
+        this.totalQuantity = totalQuantity;
+        this.availableQuantity = availableQuantity;
+        this.reservedQuantity = reservedQuantity;
+        this.soldQuantity = soldQuantity;
+        this.optionValues = optionValues;
+    }
+    
     // Getter methods
     public String getId() {
         return id;
     }
-
-    public String getName() {
-        return name;
+    
+    public String getSku() {
+        return sku;
     }
-
-    public String getDescription() {
-        return description;
+    
+    public int getPrice() {
+        return price;
     }
-
-    public String getPromotionDescription() {
-        return promotionDescription;
+    
+    public int getFinalPrice() {
+        return finalPrice;
     }
-
-    public Integer getSoldQuantity() {
-        return soldQuantity;
+    
+    public int getOriginalPrice() {
+        return originalPrice;
     }
-
-    public String getCategoryId() {
-        return categoryId;
+    
+    public int getWeight() {
+        return weight;
     }
-
-    public String getCategoryName() {
-        return categoryName;
+    
+    public boolean isRequiresShipping() {
+        return requiresShipping;
     }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public String getVendor() {
-        return vendor;
-    }
-
-    public String getHandle() {
-        return handle;
-    }
-
-    public boolean isAvailable() {
-        return available;
-    }
-
+    
     public boolean isNotAllowPromotion() {
         return notAllowPromotion;
     }
-
-    public List<ProductImage> getImages() {
-        return images;
+    
+    public String getMetadata() {
+        return metadata;
     }
-
-    public List<ProductVariant> getVariants() {
-        return variants;
+    
+    public String getBarcode() {
+        return barcode;
     }
-
-    public List<VariantOption> getOptions() {
-        return options;
+    
+    public int getPosition() {
+        return position;
     }
-
-    public int getStartingPrice() {
-        return startingPrice;
+    
+    public String getImageId() {
+        return imageId;
     }
-
-    public int getMaxPrice() {
-        return maxPrice;
+    
+    public String getProductId() {
+        return productId;
     }
-
-    public int getPromotionSale() {
-        return promotionSale;
-    }
-
+    
     public int getTotalQuantity() {
         return totalQuantity;
     }
-
-    public int getReservedQuantity() {
-        return reservedQuantity;
-    }
-
+    
     public int getAvailableQuantity() {
         return availableQuantity;
     }
-
-    public ProductVariant(String id, String name, String description, String promotionDescription, Integer soldQuantity, String categoryId, String categoryName, String status, String thumbnail, String vendor, String handle, boolean available, boolean notAllowPromotion, List<ProductImage> images, List<ProductVariant> variants, List<VariantOption> options, int startingPrice, int maxPrice, int promotionSale, int totalQuantity, int reservedQuantity, int availableQuantity) {
+    
+    public int getReservedQuantity() {
+        return reservedQuantity;
+    }
+    
+    public int getSoldQuantity() {
+        return soldQuantity;
+    }
+    
+    public List<VariantDetail> getOptionValues() {
+        return optionValues;
+    }
+    
+    // For compatibility with existing code that might use getDetails()
+    public List<VariantDetail> getDetails() {
+        return optionValues;
+    }
+    
+    // Setter methods
+    public void setId(String id) {
         this.id = id;
-        this.name = name;
-        this.description = description;
-        this.promotionDescription = promotionDescription;
-        this.soldQuantity = soldQuantity;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.status = status;
-        this.thumbnail = thumbnail;
-        this.vendor = vendor;
-        this.handle = handle;
-        this.available = available;
+    }
+    
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+    
+    public void setPrice(int price) {
+        this.price = price;
+    }
+    
+    public void setFinalPrice(int finalPrice) {
+        this.finalPrice = finalPrice;
+    }
+    
+    public void setOriginalPrice(int originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+    
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+    
+    public void setRequiresShipping(boolean requiresShipping) {
+        this.requiresShipping = requiresShipping;
+    }
+    
+    public void setNotAllowPromotion(boolean notAllowPromotion) {
         this.notAllowPromotion = notAllowPromotion;
-        this.images = images;
-        this.variants = variants;
-        this.options = options;
-        this.startingPrice = startingPrice;
-        this.maxPrice = maxPrice;
-        this.promotionSale = promotionSale;
+    }
+    
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+    
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+    
+    public void setPosition(int position) {
+        this.position = position;
+    }
+    
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
+    }
+    
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+    
+    public void setTotalQuantity(int totalQuantity) {
         this.totalQuantity = totalQuantity;
-        this.reservedQuantity = reservedQuantity;
+    }
+    
+    public void setAvailableQuantity(int availableQuantity) {
         this.availableQuantity = availableQuantity;
+    }
+    
+    public void setReservedQuantity(int reservedQuantity) {
+        this.reservedQuantity = reservedQuantity;
+    }
+    
+    public void setSoldQuantity(int soldQuantity) {
+        this.soldQuantity = soldQuantity;
+    }
+    
+    public void setOptionValues(List<VariantDetail> optionValues) {
+        this.optionValues = optionValues;
+    }
+    
+    // Helper methods
+    public boolean isAvailable() {
+        return availableQuantity > 0;
+    }
+    
+    public int getFinalStartingPrice() {
+        return finalPrice;
     }
 }
