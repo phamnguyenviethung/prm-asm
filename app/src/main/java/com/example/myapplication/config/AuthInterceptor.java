@@ -1,5 +1,7 @@
 package com.example.myapplication.config;
 
+import android.util.Log;
+
 import com.example.myapplication.util.TokenManager;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class AuthInterceptor implements Interceptor {
             Request request = original.newBuilder()
                     .header("Authorization", "Bearer " + token)
                     .build();
+            Log.d("AuthInterceptor", "Token added to request: " + token);
             return chain.proceed(request);
         }
 

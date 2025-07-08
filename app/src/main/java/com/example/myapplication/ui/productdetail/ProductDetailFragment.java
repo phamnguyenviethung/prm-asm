@@ -1,38 +1,50 @@
 package com.example.myapplication.ui.productdetail;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.Navigation;
-import androidx.navigation.NavController;
-
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+import androidx.activity.OnBackPressedCallback;
 
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.FragmentProductDetailBinding;
+import com.example.myapplication.dto.response.ErrorResponse;
 import com.example.myapplication.model.ProductDetail;
+import com.example.myapplication.model.ProductVariant;
+import com.example.myapplication.model.VariantDetail;
 import com.example.myapplication.model.VariantOption;
 import com.example.myapplication.util.AuthManager;
+import com.example.myapplication.util.ErrorUtils;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import com.example.myapplication.config.ApiClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProductDetailFragment extends Fragment implements ProductOptionAdapter.OnOptionSelectedListener {
 
@@ -55,12 +67,21 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
     private TextView tvDescription;
     private RecyclerView rvOptions;
     private Button btnAddToCart;
+    private TextView tvQuantity;
+    private ImageButton btnDecreaseQuantity;
+    private ImageButton btnIncreaseQuantity;
+    private TextView tvSelectedPrice;
+    private TextView tvTotalPrice;
+    private LinearLayout bottomAddToCartSection;
     
     private ProductImageAdapter imageAdapter;
     private ProductOptionAdapter optionAdapter;
     
     private final Map<String, String> selectedOptions = new HashMap<>();
-    
+
+    // Quantity management
+    private int selectedQuantity = 1;
+
     private static final String ARG_PRODUCT_ID = "productId";
     
     public static ProductDetailFragment newInstance(String productId) {
@@ -145,8 +166,16 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
         tvDescription = binding.tvDescription;
         rvOptions = binding.rvOptions;
         btnAddToCart = binding.btnAddToCart;
-        
+        tvQuantity = binding.tvQuantity;
+        btnDecreaseQuantity = binding.btnDecreaseQuantity;
+        btnIncreaseQuantity = binding.btnIncreaseQuantity;
+        tvSelectedPrice = binding.tvSelectedPrice;
+        tvTotalPrice = binding.tvTotalPrice;
+        bottomAddToCartSection = binding.bottomAddToCartSection;
+
         btnAddToCart.setOnClickListener(v -> addToCart());
+        btnDecreaseQuantity.setOnClickListener(v -> decreaseQuantity());
+        btnIncreaseQuantity.setOnClickListener(v -> increaseQuantity());
     }
     
     private void setupAdapters() {
@@ -237,7 +266,10 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
             
             // Enable/disable add to cart button based on availability
             btnAddToCart.setEnabled(product.isAvailable());
-            
+
+            // Initialize bottom section price
+            updateBottomSectionPrice();
+
             showContent();
         }
     }
@@ -245,52 +277,287 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
     @Override
     public void onOptionSelected(String optionId, String valueId) {
         selectedOptions.put(optionId, valueId);
-        // You could update price or availability based on selected options here
+        updateUIBasedOnSelection();
+    }
+
+    private void decreaseQuantity() {
+        if (selectedQuantity > 1) {
+            selectedQuantity--;
+            updateQuantityDisplay();
+        }
+    }
+
+    private void increaseQuantity() {
+        // Get max available quantity for selected variant
+        int maxQuantity = getMaxAvailableQuantity();
+        if (selectedQuantity < maxQuantity) {
+            selectedQuantity++;
+            updateQuantityDisplay();
+        } else {
+            Toast.makeText(requireContext(), "Maximum available quantity: " + maxQuantity, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateQuantityDisplay() {
+        tvQuantity.setText(String.valueOf(selectedQuantity));
+
+        // Update button states
+        btnDecreaseQuantity.setEnabled(selectedQuantity > 1);
+        btnIncreaseQuantity.setEnabled(selectedQuantity < getMaxAvailableQuantity());
+
+        // Update total price in bottom section
+        updateBottomSectionPrice();
+    }
+
+    private int getMaxAvailableQuantity() {
+        ProductDetail product = viewModel.getProductDetail().getValue();
+        if (product == null) return 1;
+
+        // Find the matching variant
+        String variantId = findSelectedVariantId();
+        if (variantId != null) {
+            for (ProductVariant variant : product.getVariants()) {
+                if (variant.getId().equals(variantId)) {
+                    return Math.max(1, variant.getAvailableQuantity());
+                }
+            }
+        }
+
+        // Fallback to product's available quantity
+        return Math.max(1, product.getAvailableQuantity());
+    }
+
+    private void updateUIBasedOnSelection() {
+        ProductDetail product = viewModel.getProductDetail().getValue();
+        if (product == null) return;
+
+        // Find the matching variant
+        String variantId = findSelectedVariantId();
+        ProductVariant selectedVariant = null;
+
+        if (variantId != null) {
+            for (ProductVariant variant : product.getVariants()) {
+                if (variant.getId().equals(variantId)) {
+                    selectedVariant = variant;
+                    break;
+                }
+            }
+        }
+
+        // Update price if a specific variant is selected
+        if (selectedVariant != null) {
+            String priceText = selectedVariant.getFinalPrice() + " VNĐ";
+            tvPrice.setText(priceText);
+
+            // Update availability
+            if (selectedVariant.isAvailable() && selectedVariant.getAvailableQuantity() > 0) {
+                tvAvailability.setText("In Stock (" + selectedVariant.getAvailableQuantity() + " available)");
+                tvAvailability.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                btnAddToCart.setEnabled(true);
+            } else {
+                tvAvailability.setText("Out of Stock");
+                tvAvailability.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                btnAddToCart.setEnabled(false);
+            }
+        } else {
+            // Show price range if no specific variant is selected
+            String priceText;
+            if (product.getFinalStartingPrice() == product.getFinalMaxPrice()) {
+                priceText = product.getFinalStartingPrice() + " VNĐ";
+            } else {
+                priceText = product.getFinalStartingPrice() + " VNĐ - " +
+                        product.getFinalMaxPrice() + " VNĐ";
+            }
+            tvPrice.setText(priceText);
+
+            // Reset availability to general product availability
+            if (product.isAvailable() && product.getAvailableQuantity() > 0) {
+                tvAvailability.setText("In Stock (" + product.getAvailableQuantity() + " available)");
+                tvAvailability.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                tvAvailability.setText("Out of Stock");
+                tvAvailability.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            }
+
+            // Enable/disable add to cart based on whether all options are selected
+            btnAddToCart.setEnabled(product.isAvailable() &&
+                (product.getOptions().isEmpty() || selectedOptions.size() == product.getOptions().size()));
+        }
+
+        // Update quantity display and controls
+        updateQuantityDisplay();
+    }
+
+    private void updateBottomSectionPrice() {
+        ProductDetail product = viewModel.getProductDetail().getValue();
+        if (product == null) return;
+
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+
+        // Find the matching variant
+        String variantId = findSelectedVariantId();
+        int unitPrice;
+
+        if (variantId != null) {
+            ProductVariant selectedVariant = null;
+            for (ProductVariant variant : product.getVariants()) {
+                if (variant.getId().equals(variantId)) {
+                    selectedVariant = variant;
+                    break;
+                }
+            }
+            unitPrice = selectedVariant != null ? selectedVariant.getFinalPrice() : product.getFinalStartingPrice();
+        } else {
+            unitPrice = product.getFinalStartingPrice();
+        }
+
+        // Update unit price display
+        String unitPriceText = formatter.format(unitPrice) + " VND";
+        tvSelectedPrice.setText(unitPriceText);
+
+        // Update total price if quantity > 1
+        if (selectedQuantity > 1) {
+            int totalPrice = unitPrice * selectedQuantity;
+            String totalPriceText = "Total: " + formatter.format(totalPrice) + " VND";
+            tvTotalPrice.setText(totalPriceText);
+            tvTotalPrice.setVisibility(View.VISIBLE);
+        } else {
+            tvTotalPrice.setVisibility(View.GONE);
+        }
     }
     
     private void addToCart() {
-        // Get selected product variant
-        String variantId = findSelectedVariantId();
-        
-        if (variantId == null) {
-            Toast.makeText(requireContext(), "Please select all options", Toast.LENGTH_SHORT).show();
+        // Check if user is still logged in
+        if (!AuthManager.getInstance(requireContext()).isLoggedIn()) {
+            AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
             return;
         }
-        
+
+        // Get selected product variant
+        String variantId = findSelectedVariantId();
+
+        if (variantId == null) {
+            // Show specific error message based on the issue
+            ProductDetail product = viewModel.getProductDetail().getValue();
+            if (product != null && !product.getOptions().isEmpty()) {
+                if (selectedOptions.size() == 0) {
+                    Toast.makeText(requireContext(), "Please select product options", Toast.LENGTH_SHORT).show();
+                } else if (selectedOptions.size() < product.getOptions().size()) {
+                    Toast.makeText(requireContext(), "Please select all required options", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(requireContext(), "Selected combination is not available", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(requireContext(), "Product variant not found", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
         // Get product ID from arguments
         String productId = getArguments().getString(ARG_PRODUCT_ID);
-        
-        // Call ViewModel to add to cart
-        viewModel.addToCart(productId, variantId, 1);
-        
-        Toast.makeText(requireContext(), "Added to cart", Toast.LENGTH_SHORT).show();
+
+        // Show loading indicator
+        progressBar.setVisibility(View.VISIBLE);
+        btnAddToCart.setEnabled(false);
+        btnAddToCart.setText("Adding...");
+
+        // Create request object with selected quantity
+        com.example.myapplication.dto.request.Cart.AddItemToCartRequest request =
+            new com.example.myapplication.dto.request.Cart.AddItemToCartRequest(selectedQuantity);
+
+        // Call API to add item to cart
+        ApiClient.getRetrofitInstance(requireContext())
+            .create(com.example.myapplication.api.CartService.class)
+            .addItemToCart(variantId, request)
+            .enqueue(new retrofit2.Callback<Void>() {
+                @Override
+                public void onResponse(retrofit2.Call<Void> call, retrofit2.Response<Void> response) {
+                    progressBar.setVisibility(View.GONE);
+                    btnAddToCart.setEnabled(true);
+                    btnAddToCart.setText("Add to Cart");
+
+                    if (response.isSuccessful()) {
+                        String successMsg = "✓ Added " + selectedQuantity + " item" +
+                            (selectedQuantity > 1 ? "s" : "") + " to cart!";
+                        Toast.makeText(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
+
+                        // Optional: Navigate to cart or show cart icon animation
+                        // You can uncomment the line below to navigate to cart after adding
+                        // Navigation.findNavController(requireView()).navigate(R.id.navigation_cart);
+
+                    } else {
+                        ErrorResponse errorResponse = ErrorUtils.processError(response);
+                        String errorMsg = "Failed to add to cart: " + errorResponse.getError();
+                        Log.e("ProductDetailFragment", "Error adding to cart: " + errorResponse.getError());
+                        Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<Void> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    btnAddToCart.setEnabled(true);
+                    btnAddToCart.setText("Add to Cart");
+                    Toast.makeText(requireContext(), "Network error. Please try again.",
+                        Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private String findSelectedVariantId() {
-        // This is a simplified example. In a real app, you would need to match
-        // the selected options with available variants to find the correct variant ID.
-        
-        // Check if all options have been selected
         ProductDetail product = viewModel.getProductDetail().getValue();
         if (product == null) return null;
-        
+
         // If there are no options, return the first variant ID
         if (product.getOptions().isEmpty() && !product.getVariants().isEmpty()) {
             return product.getVariants().get(0).getId();
         }
-        
+
         // Check if all options have been selected
         if (selectedOptions.size() != product.getOptions().size()) {
             return null;
         }
-        
-        // In a real app, you would match the selected options with variants
-        // For simplicity, we'll just return the first variant ID
-        if (!product.getVariants().isEmpty()) {
-            return product.getVariants().get(0).getId();
+
+        // Find the variant that matches all selected options
+        for (ProductVariant variant : product.getVariants()) {
+            if (variantMatchesSelectedOptions(variant, selectedOptions)) {
+                return variant.getId();
+            }
         }
-        
+
         return null;
+    }
+
+    private boolean variantMatchesSelectedOptions(ProductVariant variant, Map<String, String> selectedOptions) {
+        // If variant has no option values, we can't match it properly
+        List<VariantDetail> variantDetails = variant.getOptionValues();
+        if (variantDetails == null || variantDetails.isEmpty()) {
+            return false;
+        }
+
+        // First, check if the variant has the same number of details as selected options
+        if (variantDetails.size() != selectedOptions.size()) {
+            return false;
+        }
+
+        // Create a map of the variant's option-value pairs for easier comparison
+        Map<String, String> variantOptions = new HashMap<>();
+        for (VariantDetail detail : variantDetails) {
+            variantOptions.put(detail.getOptionId(), detail.getValueId());
+        }
+
+        // Check if all selected options match the variant's details
+        for (Map.Entry<String, String> selectedOption : selectedOptions.entrySet()) {
+            String optionId = selectedOption.getKey();
+            String valueId = selectedOption.getValue();
+
+            // Check if this option exists in the variant and has the same value
+            if (!variantOptions.containsKey(optionId) || !variantOptions.get(optionId).equals(valueId)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void showLoading() {
@@ -298,6 +565,7 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
         tvError.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.GONE);
         contentScrollView.setVisibility(View.GONE);
+        bottomAddToCartSection.setVisibility(View.GONE);
     }
 
     private void showContent() {
@@ -305,12 +573,14 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
         tvError.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.GONE);
         contentScrollView.setVisibility(View.VISIBLE);
+        bottomAddToCartSection.setVisibility(View.VISIBLE);
     }
 
     private void showError(String errorMessage) {
         progressBar.setVisibility(View.GONE);
         contentScrollView.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.GONE);
+        bottomAddToCartSection.setVisibility(View.GONE);
         tvError.setVisibility(View.VISIBLE);
         tvError.setText(errorMessage);
     }
@@ -319,6 +589,7 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
         progressBar.setVisibility(View.GONE);
         contentScrollView.setVisibility(View.GONE);
         tvError.setVisibility(View.GONE);
+        bottomAddToCartSection.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.VISIBLE);
         tvEmptyState.setText("Product not found");
     }
@@ -329,6 +600,11 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
         binding = null;
     }
 }
+
+
+
+
+
 
 
 
