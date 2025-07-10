@@ -44,6 +44,13 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         initServices();
         setupListeners();
+
+        // Check if we have a registered email to pre-fill
+        String registeredEmail = getIntent().getStringExtra("registered_email");
+        if (registeredEmail != null && !registeredEmail.isEmpty()) {
+            etEmail.setText(registeredEmail);
+            etPassword.requestFocus();
+        }
     }
 
     private void initViews() {
@@ -61,6 +68,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnLogin.setOnClickListener(v -> attemptLogin());
+
+        // Setup register link click listener
+        TextView tvRegisterLink = findViewById(R.id.tvRegisterLink);
+        if (tvRegisterLink != null) {
+            tvRegisterLink.setOnClickListener(v -> {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void attemptLogin() {
