@@ -20,7 +20,6 @@ import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
-    private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.US);
     private List<Product> products = new ArrayList<>();
     private OnProductClickListener listener;
 
@@ -83,10 +82,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             // Display the price range or single price
             String priceText;
             if (product.getFinalStartingPrice() == product.getFinalMaxPrice()) {
-                priceText = currencyFormatter.format(product.getFinalStartingPrice());
+                priceText = product.getFinalStartingPrice() + " VNĐ";
             } else {
-                priceText = currencyFormatter.format(product.getFinalStartingPrice()) + " - " +
-                        currencyFormatter.format(product.getFinalMaxPrice());
+                priceText = product.getFinalStartingPrice() + " VNĐ - " +
+                        product.getFinalMaxPrice() + " VNĐ";
             }
             tvPrice.setText(priceText);
 

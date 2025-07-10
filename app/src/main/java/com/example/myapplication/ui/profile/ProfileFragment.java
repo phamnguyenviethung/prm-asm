@@ -29,6 +29,7 @@ public class ProfileFragment extends Fragment {
     private TextView textStreetAddress;
     private TextView textProvince;
     private TextView textDistrict;
+    private TextView textWard;
     private Button btnLogout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -57,6 +58,7 @@ public class ProfileFragment extends Fragment {
         textStreetAddress = binding.textStreetAddress;
         textProvince = binding.textProvince;
         textDistrict = binding.textDistrict;
+        textWard = binding.textWard;
         btnLogout = binding.btnLogout;
     }
 
@@ -93,6 +95,7 @@ public class ProfileFragment extends Fragment {
             textStreetAddress.setText(customer.getStreetAddress());
             textProvince.setText(customer.getProvince());
             textDistrict.setText(customer.getDistrict());
+            textWard.setText(customer.getWard());
 
             // Show content
             binding.profileCard.setVisibility(View.VISIBLE);

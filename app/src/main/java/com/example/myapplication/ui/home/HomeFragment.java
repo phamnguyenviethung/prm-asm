@@ -11,10 +11,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import android.os.Bundle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.myapplication.R;
 import com.example.myapplication.databinding.FragmentHomeBinding;
 import com.example.myapplication.model.Product;
 import com.example.myapplication.util.AuthManager;
@@ -118,8 +121,10 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     public void onProductClick(Product product) {
         // Check if user is still logged in before handling click
         if (AuthManager.getInstance(requireContext()).isLoggedIn()) {
-            Toast.makeText(getContext(), "Product clicked: " + product.getName(), Toast.LENGTH_SHORT).show();
-            // TODO: Navigate to product details page
+            // Navigate to product detail using Bundle instead of generated directions
+            Bundle args = new Bundle();
+            args.putString("productId", product.getId());
+            Navigation.findNavController(requireView()).navigate(R.id.action_navigation_home_to_productDetailFragment, args);
         } else {
             AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
         }

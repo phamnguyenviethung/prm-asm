@@ -8,13 +8,14 @@ public class Customer {
     private String streetAddress;
     private String province;
     private String district;
+    private String ward;
     private String role;
 
     public Customer() {
     }
 
     public Customer(String id, String fullName, String email, String phone, String streetAddress, String province,
-                    String district, String role) {
+                    String district, String ward, String role) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -22,6 +23,7 @@ public class Customer {
         this.streetAddress = streetAddress;
         this.province = province;
         this.district = district;
+        this.ward = ward;
         this.role = role;
     }
 
@@ -79,6 +81,14 @@ public class Customer {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getWard() {
+        return ward;
+    }
+
+    public void setWard(String ward) {
+        this.ward = ward;
     }
 
     public String getRole() {

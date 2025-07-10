@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Android Java (Remote)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 8700,
+      "timeout": 30000,
+      "sourcePaths": [
+        "${workspaceRoot}/app/src/main/java",
+        "${workspaceRoot}/app/src/debug/java"
+      ]
+    },
+    {
+      "type": "java",
+      "name": "Debug Java",
+      "request": "launch",
+      "mainClass": "",
+      "args": "",
+      "console": "internalConsole",
+      "stopOnEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}
