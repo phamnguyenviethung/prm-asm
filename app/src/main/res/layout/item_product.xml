@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,19 +22,26 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
 
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/background_light"
+            app:layout_constraintTop_toBottomOf="@id/ivProductImage" />
+
         <TextView
             android:id="@+id/tvProductName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_primary_light"
             android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/ivProductImage"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintTop_toBottomOf="@id/divider"
             tools:text="Product Name" />
 
         <TextView
@@ -42,28 +49,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/text_secondary_light"
             android:textSize="12sp"
             app:layout_constraintTop_toBottomOf="@id/tvProductName"
             tools:text="Vendor" />
 
         <TextView
             android:id="@+id/tvPrice"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:layout_marginBottom="12dp"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:textColor="@color/accent"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvVendor"
             tools:text="VNĐ 49.999" />
 
+        <ImageView
+            android:id="@+id/ivAddToCart"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Add to cart"
+            android:padding="4dp"
+            android:src="@drawable/ic_shopping_cart"
+            android:tint="@color/primary"
+            app:layout_constraintBottom_toBottomOf="@id/tvPrice"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvPrice" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>

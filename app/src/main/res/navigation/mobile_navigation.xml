@@ -24,9 +24,9 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.myapplication.ui.dashboard.DashboardFragment"
+        android:name="com.example.myapplication.ui.orderhistory.OrderHistoryFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard">
+        tools:layout="@layout/fragment_order_history">
         <action
             android:id="@+id/action_navigation_dashboard_to_cart"
             app:destination="@id/navigation_cart" />

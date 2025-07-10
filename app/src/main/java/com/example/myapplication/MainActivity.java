@@ -87,8 +87,12 @@ public class MainActivity extends AppCompatActivity implements CartNotificationD
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_profile)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
+        // Setup custom toolbar instead of action bar
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        
+
         // Handle bottom navigation with custom listener to clear back stack
         navView.setOnItemSelectedListener(item -> {
             // Clear back stack and navigate to the selected destination
@@ -161,4 +165,3 @@ public class MainActivity extends AppCompatActivity implements CartNotificationD
     }
 
 }
-

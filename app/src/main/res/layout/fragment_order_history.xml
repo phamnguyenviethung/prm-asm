@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/background_light"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".ui.orderhistory.OrderHistoryFragment">
 
     <!-- Header -->
     <com.google.android.material.appbar.AppBarLayout

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,20 +16,23 @@ import com.example.myapplication.config.ApiClient;
 import com.example.myapplication.dto.request.LoginRequest;
 import com.example.myapplication.dto.response.ErrorResponse;
 import com.example.myapplication.dto.response.LoginResponse;
-import com.example.myapplication.service.CartNotificationService;
 import com.example.myapplication.util.ErrorUtils;
 import com.example.myapplication.util.HubSpotChatManager;
 import com.example.myapplication.util.TokenManager;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
+    private TextInputLayout tilEmail;
+    private TextInputLayout tilPassword;
     private TextInputEditText etEmail;
     private TextInputEditText etPassword;
-    private Button btnLogin;
+    private MaterialButton btnLogin;
     private TextView tvError;
     private ProgressBar progressBar;
     private AuthService authService;
@@ -54,6 +56,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPassword = findViewById(R.id.tilPassword);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
@@ -83,15 +87,28 @@ public class LoginActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
+        // Clear previous errors
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+        hideError();
+
         // Validate inputs
-        if (email.isEmpty() || password.isEmpty()) {
-            showError("Email and password are required");
+        boolean isValid = true;
+        if (email.isEmpty()) {
+            tilEmail.setError("Email is required");
+            isValid = false;
+        }
+        if (password.isEmpty()) {
+            tilPassword.setError("Password is required");
+            isValid = false;
+        }
+
+        if (!isValid) {
             return;
         }
 
         // Show loading state
         setLoading(true);
-        hideError();
 
         // Create login request
         LoginRequest loginRequest = new LoginRequest(email, password);
@@ -156,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
     private void setLoading(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         btnLogin.setEnabled(!isLoading);
-        etEmail.setEnabled(!isLoading);
-        etPassword.setEnabled(!isLoading);
+        tilEmail.setEnabled(!isLoading);
+        tilPassword.setEnabled(!isLoading);
     }
 }
