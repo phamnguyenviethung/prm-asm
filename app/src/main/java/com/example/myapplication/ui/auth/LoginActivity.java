@@ -17,6 +17,7 @@ import com.example.myapplication.config.ApiClient;
 import com.example.myapplication.dto.request.LoginRequest;
 import com.example.myapplication.dto.response.ErrorResponse;
 import com.example.myapplication.dto.response.LoginResponse;
+import com.example.myapplication.service.CartNotificationService;
 import com.example.myapplication.util.ErrorUtils;
 import com.example.myapplication.util.HubSpotChatManager;
 import com.example.myapplication.util.TokenManager;
@@ -109,9 +110,10 @@ public class LoginActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         HubSpotChatManager.getInstance().setUserInfo(email, loginResponse.getAccessToken());
 
-        // Navigate to main activity
+        // Navigate to main activity with flag to check cart
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("check_cart_after_login", true);
         startActivity(intent);
         finish();
     }

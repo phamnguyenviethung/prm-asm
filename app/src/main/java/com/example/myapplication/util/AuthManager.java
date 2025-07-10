@@ -9,7 +9,7 @@ import com.example.myapplication.ui.auth.LoginActivity;
 
 public class AuthManager {
     private static AuthManager instance;
-    private final TokenManager tokenManager;
+    public final TokenManager tokenManager;
 
     private AuthManager(Context context) {
         tokenManager = new TokenManager(context);

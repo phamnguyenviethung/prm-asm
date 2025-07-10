@@ -12,12 +12,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.myapplication.databinding.ActivityMainBinding;
+import com.example.myapplication.service.CartNotificationService;
+import com.example.myapplication.ui.dialog.CartNotificationDialog;
+import com.example.myapplication.ui.widget.DraggableChatButton;
 import com.example.myapplication.util.AuthManager;
 import com.example.myapplication.util.HubSpotChatManager;
+import com.example.myapplication.util.NotificationHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CartNotificationDialog.CartNotificationListener {
     private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
     private NavController navController;
@@ -29,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
         // Initialize HubSpot Chat SDK
         initializeHubSpotChat();
 
+        // Initialize notification channel
+        NotificationHelper.createNotificationChannel(this);
+
         // Check if user is logged in
         AuthManager.getInstance(this).checkLoginAndRedirect(this);
 
@@ -37,6 +43,12 @@ public class MainActivity extends AppCompatActivity {
 
         setupNavigation();
         setupChatButton();
+
+        // Handle navigation from notification
+        handleNotificationNavigation();
+
+        // Check cart after login if needed
+        handleCartCheckAfterLogin();
     }
 
     private void initializeHubSpotChat() {
@@ -49,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupChatButton() {
-        FloatingActionButton fabChat = findViewById(R.id.fab_chat);
+        DraggableChatButton fabChat = findViewById(R.id.fab_chat);
+        // The DraggableChatButton handles its own click events
+        // But we can override the click behavior if needed
         fabChat.setOnClickListener(v -> {
             Log.d(TAG, "Chat button clicked");
             openHubSpotChat();
@@ -99,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 AuthManager.getInstance(this).checkLoginAndRedirect(this);
             }
             return true;
+        } else if (item.getItemId() == R.id.action_test_cart_notification) {
+            // Test cart notification (for debugging)
+            testCartNotification();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -107,6 +125,39 @@ public class MainActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         return navController.navigateUp() || super.onSupportNavigateUp();
+    }
+
+    private void handleNotificationNavigation() {
+        if (getIntent() != null && getIntent().getBooleanExtra("navigate_to_cart", false)) {
+            // Navigate to cart when coming from notification
+            navController.navigate(R.id.navigation_cart);
+        }
+    }
+
+    private void handleCartCheckAfterLogin() {
+        if (getIntent() != null && getIntent().getBooleanExtra("check_cart_after_login", false)) {
+            // Use a small delay to ensure MainActivity is fully loaded
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                Log.d(TAG, "Checking cart after login...");
+                CartNotificationService.getInstance().checkCartAfterLogin(this);
+            }, 1000);
+        }
+    }
+
+    private void testCartNotification() {
+        Log.d(TAG, "Testing cart notification...");
+        CartNotificationService.getInstance().checkCartAfterLogin(this);
+    }
+
+    // CartNotificationDialog.CartNotificationListener implementation
+    @Override
+    public void onGoToCart() {
+        navController.navigate(R.id.navigation_cart);
+    }
+
+    @Override
+    public void onGoToHome() {
+        navController.navigate(R.id.navigation_home);
     }
 
 }

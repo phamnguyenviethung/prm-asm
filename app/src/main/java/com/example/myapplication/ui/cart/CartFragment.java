@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -37,6 +39,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemActi
     private LinearLayout layoutEmptyCart;
     private LinearLayout layoutCartSummary;
     private SwipeRefreshLayout swipeRefresh;
+    private Button btnCheckout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemActi
         setupRecyclerView();
         observeViewModel();
         setupSwipeRefresh();
+        setupClickListeners();
 
         return root;
     }
@@ -65,6 +69,7 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemActi
         layoutEmptyCart = binding.layoutEmptyCart;
         layoutCartSummary = binding.layoutCartSummary;
         swipeRefresh = binding.swipeRefresh;
+        btnCheckout = binding.btnCheckout;
     }
 
     private void setupRecyclerView() {
@@ -80,6 +85,25 @@ public class CartFragment extends Fragment implements CartAdapter.OnCartItemActi
                 cartViewModel.loadCart();
             } else {
                 swipeRefresh.setRefreshing(false);
+                AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
+            }
+        });
+    }
+
+    private void setupClickListeners() {
+        btnCheckout.setOnClickListener(v -> {
+            // Check if user is still logged in before proceeding to checkout
+            if (AuthManager.getInstance(requireContext()).isLoggedIn()) {
+                // Check if cart is not empty
+                Boolean isEmpty = cartViewModel.getIsEmpty().getValue();
+                if (isEmpty == null || isEmpty) {
+                    Toast.makeText(requireContext(), "Your cart is empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Navigate to checkout
+                Navigation.findNavController(v).navigate(R.id.action_cart_to_checkout);
+            } else {
                 AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
             }
         });

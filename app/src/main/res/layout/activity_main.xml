@@ -30,8 +30,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
 
-    <!-- Floating Action Button for HubSpot Chat -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <!-- Draggable Floating Action Button for Chat -->
+    <com.example.myapplication.ui.widget.DraggableChatButton
         android:id="@+id/fab_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,6 +40,7 @@
         android:src="@drawable/ic_chat"
         app:layout_constraintBottom_toTopOf="@id/nav_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@android:color/white" />
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/teal_700" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
