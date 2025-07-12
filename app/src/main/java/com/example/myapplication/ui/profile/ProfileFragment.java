@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.myapplication.databinding.FragmentProfileBinding;
 import com.example.myapplication.model.Customer;
 import com.example.myapplication.util.AuthManager;
+import com.google.android.material.button.MaterialButton;
 
 public class ProfileFragment extends Fragment {
 
@@ -30,10 +32,11 @@ public class ProfileFragment extends Fragment {
     private TextView textProvince;
     private TextView textDistrict;
     private TextView textWard;
-    private Button btnLogout;
+    private MaterialButton btnEditProfile;
+    private MaterialButton btnLogout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+            ViewGroup container, Bundle savedInstanceState) {
         // Check if user is logged in
         AuthManager.getInstance(requireContext()).checkLoginAndRedirect(requireContext());
 
@@ -49,6 +52,13 @@ public class ProfileFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh profile data when returning to this fragment
+        profileViewModel.refreshCustomerData();
+    }
+
     private void initViews() {
         loadingProfile = binding.loadingProfile;
         errorText = binding.errorText;
@@ -59,10 +69,16 @@ public class ProfileFragment extends Fragment {
         textProvince = binding.textProvince;
         textDistrict = binding.textDistrict;
         textWard = binding.textWard;
+        btnEditProfile = binding.btnEditProfile;
         btnLogout = binding.btnLogout;
     }
 
     private void setupListeners() {
+        btnEditProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), UpdateProfileActivity.class);
+            startActivity(intent);
+        });
+
         btnLogout.setOnClickListener(v -> {
             AuthManager.getInstance(requireContext()).logout(requireContext());
             Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();

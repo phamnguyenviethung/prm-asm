@@ -177,7 +177,7 @@ public class CheckoutViewModel extends AndroidViewModel {
     }
 
     public void loadCustomerProfile() {
-        customerService.getMyProfile().enqueue(new Callback<Customer>() {
+        customerService.getCustomerProfile().enqueue(new Callback<Customer>() {
             @Override
             public void onResponse(Call<Customer> call, Response<Customer> response) {
                 if (response.isSuccessful() && response.body() != null) {

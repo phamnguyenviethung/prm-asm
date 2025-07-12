@@ -1,28 +1,30 @@
-package com.example.myapplication.ui.auth;
+package com.example.myapplication.ui.profile;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.myapplication.R;
-import com.example.myapplication.api.AuthService;
+import com.example.myapplication.api.CustomerService;
 import com.example.myapplication.api.RegionService;
 import com.example.myapplication.config.ApiClient;
-import com.example.myapplication.dto.request.RegisterRequest;
+import com.example.myapplication.dto.request.UpdateAddressRequest;
 import com.example.myapplication.dto.response.ErrorResponse;
-import com.example.myapplication.dto.response.RegisterResponse;
+import com.example.myapplication.model.Customer;
 import com.example.myapplication.model.District;
 import com.example.myapplication.model.Province;
 import com.example.myapplication.model.Ward;
+import com.example.myapplication.util.AuthManager;
 import com.example.myapplication.util.ErrorUtils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -35,11 +37,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RegisterActivity extends AppCompatActivity {
-    private static final String TAG = "RegisterActivity";
+public class UpdateProfileActivity extends AppCompatActivity {
+    private static final String TAG = "UpdateProfileActivity";
 
+    private Toolbar toolbar;
     private TextInputLayout tilEmail;
-    private TextInputLayout tilPassword;
     private TextInputLayout tilFullName;
     private TextInputLayout tilPhone;
     private TextInputLayout tilStreetAddress;
@@ -48,7 +50,6 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout tilWard;
 
     private TextInputEditText etEmail;
-    private TextInputEditText etPassword;
     private TextInputEditText etFullName;
     private TextInputEditText etPhone;
     private TextInputEditText etStreetAddress;
@@ -56,13 +57,13 @@ public class RegisterActivity extends AppCompatActivity {
     private AutoCompleteTextView actvDistrict;
     private AutoCompleteTextView actvWard;
 
-    private MaterialButton btnRegister;
-    private TextView tvLoginLink;
+    private MaterialButton btnSave;
     private TextView tvError;
     private ProgressBar progressBar;
 
-    private AuthService authService;
+    private CustomerService customerService;
     private RegionService regionService;
+    private Customer currentCustomer;
 
     // Data for address selection
     private List<Province> provinces = new ArrayList<>();
@@ -80,47 +81,69 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_update_profile);
+
+        // Check if user is logged in
+        if (!AuthManager.getInstance(this).isLoggedIn()) {
+            finish();
+            return;
+        }
 
         initViews();
         initServices();
+        setupToolbar();
         setupAdapters();
         setupListeners();
+
+        // Load customer data and provinces
+        loadCustomerData();
         loadProvinces();
     }
 
     private void initViews() {
-        tilEmail = findViewById(R.id.tilEmail);
-        tilPassword = findViewById(R.id.tilPassword);
+        toolbar = findViewById(R.id.toolbar);
         tilFullName = findViewById(R.id.tilFullName);
+        tilEmail = findViewById(R.id.tilEmail);
         tilPhone = findViewById(R.id.tilPhone);
         tilStreetAddress = findViewById(R.id.tilStreetAddress);
         tilProvince = findViewById(R.id.tilProvince);
         tilDistrict = findViewById(R.id.tilDistrict);
         tilWard = findViewById(R.id.tilWard);
 
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
         etFullName = findViewById(R.id.etFullName);
+        etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         etStreetAddress = findViewById(R.id.etStreetAddress);
         actvProvince = findViewById(R.id.actvProvince);
         actvDistrict = findViewById(R.id.actvDistrict);
         actvWard = findViewById(R.id.actvWard);
 
-        btnRegister = findViewById(R.id.btnRegister);
-        tvLoginLink = findViewById(R.id.tvLoginLink);
+        btnSave = findViewById(R.id.btnSave);
         tvError = findViewById(R.id.tvError);
         progressBar = findViewById(R.id.progressBar);
 
         // Initially disable district and ward selection
         tilDistrict.setEnabled(false);
         tilWard.setEnabled(false);
+
+        // Disable personal information fields as we're only updating address
+        tilFullName.setEnabled(false);
+        tilEmail.setEnabled(false);
+        tilPhone.setEnabled(false);
     }
 
     private void initServices() {
-        authService = ApiClient.getRetrofitInstance(this).create(AuthService.class);
+        customerService = ApiClient.getRetrofitInstance(this).create(CustomerService.class);
         regionService = ApiClient.getRetrofitInstance(this).create(RegionService.class);
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Update Address");
+        }
     }
 
     private void setupAdapters() {
@@ -134,12 +157,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnRegister.setOnClickListener(v -> attemptRegister());
-        tvLoginLink.setOnClickListener(v -> {
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        btnSave.setOnClickListener(v -> saveAddress());
 
         // Setup selection listeners for address fields
         actvProvince.setOnItemClickListener((parent, view, position, id) -> {
@@ -180,17 +198,78 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    private void loadCustomerData() {
+        showLoading(true);
+        String token = AuthManager.getInstance(this).tokenManager.getToken();
+
+        customerService.getCustomerProfile().enqueue(new Callback<Customer>() {
+            @Override
+            public void onResponse(Call<Customer> call, Response<Customer> response) {
+                showLoading(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    currentCustomer = response.body();
+                    displayCustomerData(currentCustomer);
+                } else {
+                    ErrorResponse errorResponse = ErrorUtils.processError(response);
+                    showError(errorResponse != null ? errorResponse.getError() : "Failed to load profile");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Customer> call, Throwable t) {
+                showLoading(false);
+                showError("Network error: " + t.getMessage());
+                Log.e(TAG, "Failed to load customer profile", t);
+            }
+        });
+    }
+
+    private void displayCustomerData(Customer customer) {
+        etFullName.setText(customer.getFullName());
+        etEmail.setText(customer.getEmail());
+        etPhone.setText(customer.getPhone());
+        etStreetAddress.setText(customer.getStreetAddress());
+
+        // We'll set the province/district/ward after loading the data
+        String customerProvince = customer.getProvince();
+        String customerDistrict = customer.getDistrict();
+        String customerWard = customer.getWard();
+
+        // Find and set the correct province in the dropdown
+        for (Province province : provinces) {
+            if (province.getName().equals(customerProvince)) {
+                actvProvince.setText(province.getName(), false);
+                selectedProvince = province;
+                loadDistricts(province.getId());
+                break;
+            }
+        }
+    }
+
     private void loadProvinces() {
         showLoading(true);
         regionService.getProvinces().enqueue(new Callback<List<Province>>() {
             @Override
             public void onResponse(Call<List<Province>> call, Response<List<Province>> response) {
-                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     provinces.clear();
                     provinces.addAll(response.body());
                     provinceAdapter.notifyDataSetChanged();
+
+                    // If we already have customer data, try to match the province
+                    if (currentCustomer != null) {
+                        for (Province province : provinces) {
+                            if (province.getName().equals(currentCustomer.getProvince())) {
+                                actvProvince.setText(province.getName(), false);
+                                selectedProvince = province;
+                                loadDistricts(province.getId());
+                                break;
+                            }
+                        }
+                    }
+                    showLoading(false);
                 } else {
+                    showLoading(false);
                     showError("Failed to load provinces");
                 }
             }
@@ -205,16 +284,32 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void loadDistricts(String provinceId) {
+        Log.i("Districts", "Loading districts for province ID: " + provinceId);
         showLoading(true);
         regionService.getDistricts(provinceId).enqueue(new Callback<List<District>>() {
             @Override
             public void onResponse(Call<List<District>> call, Response<List<District>> response) {
-                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     districts.clear();
                     districts.addAll(response.body());
                     districtAdapter.notifyDataSetChanged();
+                    Log.i("Districts", "Loaded " + districts.size() + " districts");
+                    tilDistrict.setEnabled(true);
+
+                    // If we already have customer data, try to match the district
+                    if (currentCustomer != null) {
+                        for (District district : districts) {
+                            if (district.getName().equals(currentCustomer.getDistrict())) {
+                                actvDistrict.setText(district.getName(), false);
+                                selectedDistrict = district;
+                                loadWards(district.getId());
+                                break;
+                            }
+                        }
+                    }
+                    showLoading(false);
                 } else {
+                    showLoading(false);
                     showError("Failed to load districts");
                 }
             }
@@ -233,12 +328,25 @@ public class RegisterActivity extends AppCompatActivity {
         regionService.getWards(districtId).enqueue(new Callback<List<Ward>>() {
             @Override
             public void onResponse(Call<List<Ward>> call, Response<List<Ward>> response) {
-                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     wards.clear();
                     wards.addAll(response.body());
                     wardAdapter.notifyDataSetChanged();
+                    tilWard.setEnabled(true);
+
+                    // If we already have customer data, try to match the ward
+                    if (currentCustomer != null) {
+                        for (Ward ward : wards) {
+                            if (ward.getName().equals(currentCustomer.getWard())) {
+                                actvWard.setText(ward.getName(), false);
+                                selectedWard = ward;
+                                break;
+                            }
+                        }
+                    }
+                    showLoading(false);
                 } else {
+                    showLoading(false);
                     showError("Failed to load wards");
                 }
             }
@@ -252,12 +360,8 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void attemptRegister() {
+    private void saveAddress() {
         // Get input values
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String fullName = etFullName.getText().toString().trim();
-        String phone = etPhone.getText().toString().trim();
         String streetAddress = etStreetAddress.getText().toString().trim();
 
         // Clear previous errors
@@ -265,84 +369,54 @@ public class RegisterActivity extends AppCompatActivity {
         hideError();
 
         // Validate inputs
-        if (!validateInputs(email, password, fullName, phone, streetAddress)) {
+        if (!validateInputs(streetAddress)) {
             return;
         }
 
         // Show loading state
         showLoading(true);
 
-        // Create register request with selected address data
-        RegisterRequest registerRequest = new RegisterRequest(
-                email, password, fullName, phone, streetAddress,
+        // Create update address request
+        UpdateAddressRequest updateAddressRequest = new UpdateAddressRequest(
+                streetAddress,
                 selectedWard != null ? selectedWard.getName() : "",
                 selectedProvince != null ? selectedProvince.getName() : "",
                 selectedDistrict != null ? selectedDistrict.getName() : "");
 
-        // Make API call
-        authService.register(registerRequest).enqueue(new Callback<RegisterResponse>() {
+        // Make API call to update address
+        String token = AuthManager.getInstance(this).tokenManager.getToken();
+        customerService.updateCustomerProfile("Bearer " + token, updateAddressRequest).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 showLoading(false);
-
-                if (response.isSuccessful() && response.body() != null) {
-                    handleSuccessfulRegistration(response.body());
+                if (response.isSuccessful()) {
+                    Toast.makeText(UpdateProfileActivity.this, "Address updated successfully", Toast.LENGTH_SHORT)
+                            .show();
+                    finish();
                 } else {
-                    handleFailedRegistration(response);
+                    ErrorResponse errorResponse = ErrorUtils.processError(response);
+                    showError(errorResponse != null ? errorResponse.getError() : "Failed to update address");
                 }
             }
 
             @Override
-            public void onFailure(Call<RegisterResponse> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 showLoading(false);
-                String errorMessage = ErrorUtils.handleThrowable(t);
-                showError(errorMessage);
-                Log.e(TAG, "Network error", t);
+                showError("Network error: " + t.getMessage());
+                Log.e(TAG, "Failed to update address", t);
             }
         });
     }
 
     private void clearAllErrors() {
-        tilEmail.setError(null);
-        tilPassword.setError(null);
-        tilFullName.setError(null);
-        tilPhone.setError(null);
         tilStreetAddress.setError(null);
         tilProvince.setError(null);
         tilDistrict.setError(null);
         tilWard.setError(null);
     }
 
-    private boolean validateInputs(String email, String password, String fullName, String phone,
-            String streetAddress) {
+    private boolean validateInputs(String streetAddress) {
         boolean isValid = true;
-
-        // Simple validation
-        if (email.isEmpty()) {
-            tilEmail.setError("Email is required");
-            isValid = false;
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Please enter a valid email address");
-            isValid = false;
-        }
-
-        if (password.isEmpty()) {
-            tilPassword.setError("Password is required");
-            isValid = false;
-        } else if (password.length() < 6) {
-            tilPassword.setError("Password must be at least 6 characters");
-            isValid = false;
-        }
-
-        if (fullName.isEmpty()) {
-            tilFullName.setError("Full name is required");
-            isValid = false;
-        }
-
-        if (phone.isEmpty()) {
-            tilPhone.setError("Phone is required");
-            isValid = false;
-        }
 
         if (streetAddress.isEmpty()) {
             tilStreetAddress.setError("Street address is required");
@@ -367,31 +441,6 @@ public class RegisterActivity extends AppCompatActivity {
         return isValid;
     }
 
-    private void handleSuccessfulRegistration(RegisterResponse registerResponse) {
-        Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show();
-
-        // Navigate to login activity
-        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-        intent.putExtra("registered_email", etEmail.getText().toString().trim());
-        startActivity(intent);
-        finish();
-    }
-
-    private void handleFailedRegistration(Response<RegisterResponse> response) {
-        ErrorResponse errorResponse = ErrorUtils.processError(response);
-        String errorMessage = "Registration failed";
-
-        if (errorResponse != null && errorResponse.getError() != null) {
-            errorMessage += ": " + errorResponse.getError();
-        } else if (response.code() == 409) {
-            errorMessage = "Email already exists";
-            tilEmail.setError("Email already exists");
-        }
-
-        showError(errorMessage);
-        Log.e(TAG, "Error: " + errorMessage);
-    }
-
     private void showError(String errorMessage) {
         tvError.setText(errorMessage);
         tvError.setVisibility(View.VISIBLE);
@@ -403,13 +452,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void showLoading(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        btnRegister.setEnabled(!isLoading);
+        btnSave.setEnabled(!isLoading);
 
-        // Enable/disable all input fields
-        tilEmail.setEnabled(!isLoading);
-        tilPassword.setEnabled(!isLoading);
-        tilFullName.setEnabled(!isLoading);
-        tilPhone.setEnabled(!isLoading);
+        // Enable/disable address fields
         tilStreetAddress.setEnabled(!isLoading);
         tilProvince.setEnabled(!isLoading);
 
@@ -421,5 +466,14 @@ public class RegisterActivity extends AppCompatActivity {
             tilDistrict.setEnabled(false);
             tilWard.setEnabled(false);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

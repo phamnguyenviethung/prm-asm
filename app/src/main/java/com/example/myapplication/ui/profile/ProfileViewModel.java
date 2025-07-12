@@ -2,6 +2,7 @@ package com.example.myapplication.ui.profile;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -11,12 +12,14 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.myapplication.api.CustomerService;
 import com.example.myapplication.config.ApiClient;
 import com.example.myapplication.model.Customer;
+import com.example.myapplication.util.AuthManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProfileViewModel extends AndroidViewModel {
+    private static final String TAG = "ProfileViewModel";
 
     private final MutableLiveData<Customer> customerData;
     private final MutableLiveData<Boolean> isLoading;
@@ -52,7 +55,14 @@ public class ProfileViewModel extends AndroidViewModel {
         isLoading.setValue(true);
         error.setValue(null);
 
-        customerService.getMyProfile().enqueue(new Callback<Customer>() {
+        String token = AuthManager.getInstance(getApplication()).tokenManager.getToken();
+        if (token == null || token.isEmpty()) {
+            isLoading.setValue(false);
+            error.setValue("User not authenticated");
+            return;
+        }
+
+        customerService.getCustomerProfile().enqueue(new Callback<Customer>() {
             @Override
             public void onResponse(@NonNull Call<Customer> call, @NonNull Response<Customer> response) {
                 isLoading.setValue(false);
@@ -61,6 +71,7 @@ public class ProfileViewModel extends AndroidViewModel {
                 } else {
                     error.setValue("Failed to load profile: " +
                             (response.errorBody() != null ? response.code() : "Unknown error"));
+                    Log.e(TAG, "Error loading profile: " + response.code());
                 }
             }
 
@@ -68,7 +79,12 @@ public class ProfileViewModel extends AndroidViewModel {
             public void onFailure(@NonNull Call<Customer> call, @NonNull Throwable t) {
                 isLoading.setValue(false);
                 error.setValue("Network error: " + t.getMessage());
+                Log.e(TAG, "Network error loading profile", t);
             }
         });
+    }
+
+    public void refreshCustomerData() {
+        loadCustomerProfile();
     }
 }
