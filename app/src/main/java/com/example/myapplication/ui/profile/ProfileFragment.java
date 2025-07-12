@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.profile;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,8 @@ import com.example.myapplication.util.AuthManager;
 import com.google.android.material.button.MaterialButton;
 
 public class ProfileFragment extends Fragment {
+
+    private static final int UPDATE_PROFILE_REQUEST_CODE = 1001;
 
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
@@ -59,6 +62,16 @@ public class ProfileFragment extends Fragment {
         profileViewModel.refreshCustomerData();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == UPDATE_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Force refresh profile data after successful update with delay
+            profileViewModel.forceRefreshCustomerData();
+            Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initViews() {
         loadingProfile = binding.loadingProfile;
         errorText = binding.errorText;
@@ -76,7 +89,7 @@ public class ProfileFragment extends Fragment {
     private void setupListeners() {
         btnEditProfile.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), UpdateProfileActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, UPDATE_PROFILE_REQUEST_CODE);
         });
 
         btnLogout.setOnClickListener(v -> {

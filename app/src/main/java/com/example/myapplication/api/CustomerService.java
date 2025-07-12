@@ -15,5 +15,5 @@ public interface CustomerService {
     Call<Customer> getCustomerProfile();
 
     @PUT("customers/address")
-    Call updateCustomerProfile(@Header("Authorization") String token, @Body UpdateAddressRequest updateAddressRequest);
+    Call<Void> updateCustomerProfile(@Header("Authorization") String token, @Body UpdateAddressRequest updateAddressRequest);
 }

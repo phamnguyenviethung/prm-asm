@@ -5,15 +5,18 @@ public class UpdateAddressRequest {
     private String ward;
     private String province;
     private String district;
+    private String phone;
 
-    public UpdateAddressRequest() {
+    public UpdateAddressRequest(String phone) {
+        this.phone = phone;
     }
 
-    public UpdateAddressRequest(String streetAddress, String ward, String province, String district) {
+    public UpdateAddressRequest(String streetAddress, String ward, String province, String district, String phone) {
         this.streetAddress = streetAddress;
         this.ward = ward;
         this.province = province;
         this.district = district;
+        this.phone = phone;
     }
 
     public String getStreetAddress() {

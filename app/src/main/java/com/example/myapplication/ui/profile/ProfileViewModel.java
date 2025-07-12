@@ -85,6 +85,16 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     public void refreshCustomerData() {
+        // Clear current data first to force refresh
+        customerData.setValue(null);
         loadCustomerProfile();
+    }
+
+    public void forceRefreshCustomerData() {
+        // Force refresh with a small delay to ensure server has processed the update
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            customerData.setValue(null);
+            loadCustomerProfile();
+        }, 500); // 500ms delay
     }
 }

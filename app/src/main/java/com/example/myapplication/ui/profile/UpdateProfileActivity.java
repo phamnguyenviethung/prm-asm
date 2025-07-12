@@ -163,8 +163,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
         actvProvince.setOnItemClickListener((parent, view, position, id) -> {
             selectedProvince = provinceAdapter.getItem(position);
             if (selectedProvince != null) {
-                actvDistrict.setText("");
-                actvWard.setText("");
+                // Clear district and ward selections
+                actvDistrict.setText("", false);
+                actvWard.setText("", false);
                 selectedDistrict = null;
                 selectedWard = null;
                 districts.clear();
@@ -172,29 +173,38 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 districtAdapter.notifyDataSetChanged();
                 wardAdapter.notifyDataSetChanged();
 
+                // Enable district selection and load districts
                 tilDistrict.setEnabled(true);
                 tilWard.setEnabled(false);
 
                 loadDistricts(selectedProvince.getId());
+
+                // Clear any previous errors
+                tilProvince.setError(null);
             }
         });
 
         actvDistrict.setOnItemClickListener((parent, view, position, id) -> {
             selectedDistrict = districtAdapter.getItem(position);
             if (selectedDistrict != null) {
-                actvWard.setText("");
+                // Clear ward selection
+                actvWard.setText("", false);
                 selectedWard = null;
                 wards.clear();
                 wardAdapter.notifyDataSetChanged();
 
-                tilWard.setEnabled(true);
-
                 loadWards(selectedDistrict.getId());
+
+                // Clear any previous errors
+                tilDistrict.setError(null);
             }
         });
 
         actvWard.setOnItemClickListener((parent, view, position, id) -> {
             selectedWard = wardAdapter.getItem(position);
+
+            // Clear any previous errors
+            tilWard.setError(null);
         });
     }
 
@@ -230,20 +240,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
         etPhone.setText(customer.getPhone());
         etStreetAddress.setText(customer.getStreetAddress());
 
-        // We'll set the province/district/ward after loading the data
-        String customerProvince = customer.getProvince();
-        String customerDistrict = customer.getDistrict();
-        String customerWard = customer.getWard();
-
-        // Find and set the correct province in the dropdown
-        for (Province province : provinces) {
-            if (province.getName().equals(customerProvince)) {
-                actvProvince.setText(province.getName(), false);
-                selectedProvince = province;
-                loadDistricts(province.getId());
-                break;
-            }
-        }
+        // Address data will be set after provinces are loaded
+        // This prevents duplicate API calls
     }
 
     private void loadProvinces() {
@@ -285,7 +283,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
     private void loadDistricts(String provinceId) {
         Log.i("Districts", "Loading districts for province ID: " + provinceId);
-        showLoading(true);
         regionService.getDistricts(provinceId).enqueue(new Callback<List<District>>() {
             @Override
             public void onResponse(Call<List<District>> call, Response<List<District>> response) {
@@ -297,7 +294,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     tilDistrict.setEnabled(true);
 
                     // If we already have customer data, try to match the district
-                    if (currentCustomer != null) {
+                    if (currentCustomer != null && currentCustomer.getDistrict() != null) {
                         for (District district : districts) {
                             if (district.getName().equals(currentCustomer.getDistrict())) {
                                 actvDistrict.setText(district.getName(), false);
@@ -307,16 +304,14 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    showLoading(false);
                 } else {
-                    showLoading(false);
                     showError("Failed to load districts");
+                    Log.e(TAG, "Error loading districts: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<District>> call, Throwable t) {
-                showLoading(false);
                 showError("Network error: " + t.getMessage());
                 Log.e(TAG, "Failed to load districts", t);
             }
@@ -324,7 +319,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
     private void loadWards(String districtId) {
-        showLoading(true);
         regionService.getWards(districtId).enqueue(new Callback<List<Ward>>() {
             @Override
             public void onResponse(Call<List<Ward>> call, Response<List<Ward>> response) {
@@ -335,7 +329,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     tilWard.setEnabled(true);
 
                     // If we already have customer data, try to match the ward
-                    if (currentCustomer != null) {
+                    if (currentCustomer != null && currentCustomer.getWard() != null) {
                         for (Ward ward : wards) {
                             if (ward.getName().equals(currentCustomer.getWard())) {
                                 actvWard.setText(ward.getName(), false);
@@ -344,16 +338,15 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    showLoading(false);
+                    Log.d(TAG, "Wards loaded: " + wards.size());
                 } else {
-                    showLoading(false);
                     showError("Failed to load wards");
+                    Log.e(TAG, "Error loading wards: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Ward>> call, Throwable t) {
-                showLoading(false);
                 showError("Network error: " + t.getMessage());
                 Log.e(TAG, "Failed to load wards", t);
             }
@@ -381,26 +374,38 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 streetAddress,
                 selectedWard != null ? selectedWard.getName() : "",
                 selectedProvince != null ? selectedProvince.getName() : "",
-                selectedDistrict != null ? selectedDistrict.getName() : "");
+                selectedDistrict != null ? selectedDistrict.getName() : "",
+                etPhone.getText().toString().trim());
+
+        // Log the request data for debugging
+        Log.d(TAG, "Updating address with data:");
+        Log.d(TAG, "Street: " + streetAddress);
+        Log.d(TAG, "Province: " + (selectedProvince != null ? selectedProvince.getName() : "null"));
+        Log.d(TAG, "District: " + (selectedDistrict != null ? selectedDistrict.getName() : "null"));
+        Log.d(TAG, "Ward: " + (selectedWard != null ? selectedWard.getName() : "null"));
 
         // Make API call to update address
         String token = AuthManager.getInstance(this).tokenManager.getToken();
-        customerService.updateCustomerProfile("Bearer " + token, updateAddressRequest).enqueue(new Callback<Object>() {
+        customerService.updateCustomerProfile("Bearer " + token, updateAddressRequest).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 showLoading(false);
                 if (response.isSuccessful()) {
                     Toast.makeText(UpdateProfileActivity.this, "Address updated successfully", Toast.LENGTH_SHORT)
                             .show();
+
+                    // Set result to indicate successful update
+                    setResult(RESULT_OK);
                     finish();
                 } else {
                     ErrorResponse errorResponse = ErrorUtils.processError(response);
                     showError(errorResponse != null ? errorResponse.getError() : "Failed to update address");
+                    Log.e(TAG, "Update failed: " + response.code() + " - " + response.message());
                 }
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 showLoading(false);
                 showError("Network error: " + t.getMessage());
                 Log.e(TAG, "Failed to update address", t);
@@ -466,6 +471,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
             tilDistrict.setEnabled(false);
             tilWard.setEnabled(false);
         }
+
+        // Keep personal info fields disabled as we're only updating address
+        tilFullName.setEnabled(false);
+        tilEmail.setEnabled(false);
+        tilPhone.setEnabled(false);
     }
 
     @Override
