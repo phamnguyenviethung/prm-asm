@@ -180,7 +180,7 @@ public class ProductDetailFragment extends Fragment implements ProductOptionAdap
     
     private void setupAdapters() {
         // Setup image adapter
-        imageAdapter = new ProductImageAdapter(requireContext());
+        imageAdapter = new ProductImageAdapter();
         viewPagerImages.setAdapter(imageAdapter);
         
         // Connect TabLayout with ViewPager2

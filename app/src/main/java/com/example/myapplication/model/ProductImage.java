@@ -5,9 +5,9 @@ import java.util.Date;
 public class ProductImage {
     private String id;
     private int position;
-    private String Src;
-    private String Alt;
-    private String VariantIds;
+    private String src;
+    private String alt;
+    private String variantIds;
 
     public ProductImage() {
     }
@@ -15,9 +15,9 @@ public class ProductImage {
     public ProductImage(String id, int position, String src, String alt, String variantIds) {
         this.id = id;
         this.position = position;
-        Src = src;
-        Alt = alt;
-        VariantIds = variantIds;
+        this.src = src;
+        this.alt = alt;
+        this.variantIds = variantIds;
     }
 
     public String getId() {
@@ -37,26 +37,26 @@ public class ProductImage {
     }
 
     public String getSrc() {
-        return Src;
+        return src;
     }
 
     public void setSrc(String src) {
-        Src = src;
+        this.src = src;
     }
 
     public String getAlt() {
-        return Alt;
+        return alt;
     }
 
     public void setAlt(String alt) {
-        Alt = alt;
+        this.alt = alt;
     }
 
     public String getVariantIds() {
-        return VariantIds;
+        return variantIds;
     }
 
     public void setVariantIds(String variantIds) {
-        VariantIds = variantIds;
+        this.variantIds = variantIds;
     }
 }

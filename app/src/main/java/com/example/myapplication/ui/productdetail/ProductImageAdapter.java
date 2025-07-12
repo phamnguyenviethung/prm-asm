@@ -19,10 +19,9 @@ import java.util.List;
 public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapter.ImageViewHolder> {
 
     private List<ProductImage> images = new ArrayList<>();
-    private Context context;
 
-    public ProductImageAdapter(Context context) {
-        this.context = context;
+    public ProductImageAdapter() {
+        // Removed context parameter - we'll use the view's context instead
     }
 
     public void setImages(List<ProductImage> images) {
@@ -40,10 +39,11 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         ProductImage image = images.get(position);
-        Glide.with(context)
+        Glide.with(holder.imageView.getContext())
                 .load(image.getSrc())
                 .placeholder(R.drawable.placeholder_image)
                 .error(R.drawable.error_image)
+                .centerCrop()
                 .into(holder.imageView);
     }
 

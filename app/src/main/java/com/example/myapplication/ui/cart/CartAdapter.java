@@ -107,14 +107,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvSubtotal.setText(subtotalText);
 
             // Load product image
-            String imageUrl = item.getValueImage() != null && !item.getValueImage().isEmpty() 
-                ? item.getValueImage() : item.getThumbnail();
+            String imageUrl = item.getThumbnail();
             
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 Glide.with(itemView.getContext())
                         .load(imageUrl)
                         .placeholder(R.drawable.ic_dashboard_black_24dp)
                         .error(R.drawable.ic_dashboard_black_24dp)
+                        .centerCrop()
                         .into(ivProductImage);
             } else {
                 ivProductImage.setImageResource(R.drawable.ic_dashboard_black_24dp);
