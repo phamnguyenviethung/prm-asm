@@ -20,6 +20,7 @@ public class CartNotificationDialog extends DialogFragment {
 
     public interface CartNotificationListener {
         void onGoToCart();
+
         void onGoToHome();
     }
 
@@ -65,9 +66,9 @@ public class CartNotificationDialog extends DialogFragment {
         Button btnGoToCart = view.findViewById(R.id.btnGoToCart);
 
         // Set message based on item count
-        String message = itemCount == 1 
-                ? "Bạn đang có 1 sản phẩm trong giỏ hàng" 
-                : "Bạn đang có " + itemCount + " sản phẩm trong giỏ hàng";
+        String message = itemCount == 1
+                ? "You have 1 item in your cart"
+                : "You have " + itemCount + " items in your cart";
         tvMessage.setText(message);
 
         // Set click listeners

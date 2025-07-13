@@ -82,6 +82,27 @@ public class ProductOptionAdapter extends RecyclerView.Adapter<ProductOptionAdap
                 chip.setCheckable(true);
                 chip.setId(View.generateViewId()); // Generate unique ID for each chip
 
+                // Style the chip
+                chip.setTextSize(14f);
+                chip.setTextColor(context.getResources().getColorStateList(android.R.color.black, null));
+                chip.setChipBackgroundColorResource(R.color.gray_300);
+                chip.setCheckedIconVisible(false);
+                chip.setChipStrokeWidth(2f);
+                chip.setChipStrokeColorResource(R.color.gray_400);
+
+                // Set checked state colors
+                chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    if (isChecked) {
+                        chip.setChipBackgroundColorResource(R.color.success);
+                        chip.setTextColor(context.getResources().getColor(R.color.white, null));
+                        chip.setChipStrokeColorResource(R.color.green_500);
+                    } else {
+                        chip.setChipBackgroundColorResource(R.color.gray_300);
+                        chip.setTextColor(context.getResources().getColor(android.R.color.black, null));
+                        chip.setChipStrokeColorResource(R.color.gray_400);
+                    }
+                });
+
                 chipGroupValues.addView(chip);
             }
 

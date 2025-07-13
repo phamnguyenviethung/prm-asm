@@ -14,14 +14,14 @@
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:src="@drawable/ic_shopping_cart"
-        android:tint="@color/purple_700" />
+        app:tint="@color/purple_700" />
 
     <!-- Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Giỏ hàng của bạn"
+        android:text="Your Cart"
         android:textAlignment="center"
         android:textColor="@color/purple_700"
         android:textSize="20sp"
@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Bạn đang có sản phẩm trong giỏ hàng"
+        android:text="You have items in your cart"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Bạn muốn tiếp tục thanh toán hay trở về trang chủ?"
+        android:text="Would you like to continue checkout or go back to home?"
         android:textAlignment="center"
         android:textColor="#666666"
         android:textSize="14sp" />
@@ -63,7 +63,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Trang chủ"
+            android:text="Home"
             android:textColor="@color/purple_700"
             app:strokeColor="@color/purple_700" />
 
@@ -75,7 +75,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:backgroundTint="@color/purple_700"
-            android:text="Xem giỏ hàng"
+            android:text="View Cart"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

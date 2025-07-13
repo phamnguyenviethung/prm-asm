@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/purple_500"
-            android:text="Tiến hành thanh toán"
+            android:text="PROCEED CHECKOUT"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"

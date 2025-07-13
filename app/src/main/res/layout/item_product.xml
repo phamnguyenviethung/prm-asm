@@ -60,19 +60,22 @@
 
         <TextView
             android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/accent"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:fontFamily="sans-serif-medium"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/ivAddToCart"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvVendor"
-            tools:text="VNĐ 49.999" />
+            tools:text="15000 VNĐ - 180000 VNĐ" />
 
         <ImageView
             android:id="@+id/ivAddToCart"

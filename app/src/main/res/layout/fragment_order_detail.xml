@@ -20,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Chi tiết đơn hàng"
+            android:text="Order Details"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white" />
@@ -29,7 +29,7 @@
             android:id="@+id/btnGoHome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Về trang chủ"
+            android:text="Go to Home"
             android:textSize="14sp"
             android:backgroundTint="@android:color/white"
             android:textColor="@color/purple_500"
@@ -68,7 +68,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thông tin đơn hàng"
+                    android:text="Order Information"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/purple_700"
@@ -84,7 +84,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Mã đơn hàng:"
+                        android:text="Order Code:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -107,7 +107,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Trạng thái:"
+                        android:text="Status:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -130,7 +130,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ngày đặt:"
+                        android:text="Order Date:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -163,7 +163,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thông tin khách hàng"
+                    android:text="Customer Information"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/purple_700"
@@ -179,7 +179,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Họ tên:"
+                        android:text="Full Name:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -202,7 +202,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Số điện thoại:"
+                        android:text="Phone Number:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -245,7 +245,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Địa chỉ:"
+                        android:text="Address:"
                         android:textSize="14sp"
                         android:layout_marginBottom="4dp" />
 
@@ -267,7 +267,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Phương thức thanh toán:"
+                        android:text="Payment Method:"
                         android:textSize="14sp" />
 
                     <TextView
@@ -284,7 +284,7 @@
                     android:id="@+id/tvNoteLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ghi chú:"
+                    android:text="Note:"
                     android:textSize="14sp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="4dp" />
@@ -318,7 +318,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sản phẩm đã đặt"
+                    android:text="Ordered Products"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/purple_700"
@@ -350,7 +350,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tóm tắt đơn hàng"
+                    android:text="Order Summary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/purple_700"
@@ -366,7 +366,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tạm tính:"
+                        android:text="Subtotal:"
                         android:textSize="16sp" />
 
                     <TextView
@@ -389,7 +389,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Phí vận chuyển:"
+                        android:text="Shipping Fee:"
                         android:textSize="16sp" />
 
                     <TextView
@@ -417,7 +417,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tổng cộng:"
+                        android:text="Total:"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#FF5722" />

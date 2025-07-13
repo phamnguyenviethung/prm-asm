@@ -60,12 +60,22 @@
             <!-- Image Indicator -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayoutIndicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/viewPagerImages"
                 app:tabBackground="@drawable/tab_selector"
                 app:tabGravity="center"
-                app:tabIndicatorHeight="0dp" />
+                app:tabIndicatorHeight="0dp"
+                app:tabMaxWidth="8dp"
+                app:tabMinWidth="8dp"
+                app:tabPaddingBottom="0dp"
+                app:tabPaddingEnd="2dp"
+                app:tabPaddingStart="2dp"
+                app:tabPaddingTop="0dp" />
 
             <!-- Product Basic Info Card -->
             <androidx.cardview.widget.CardView
@@ -87,8 +97,9 @@
                         android:id="@+id/tvProductName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
+                        android:textColor="@color/text_primary_light"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Product Name" />
 
@@ -97,9 +108,10 @@
                         android:id="@+id/tvVendor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@android:color/darker_gray"
-                        android:textSize="14sp"
+                        android:layout_marginTop="6dp"
+                        android:textColor="@color/primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         app:layout_constraintTop_toBottomOf="@id/tvProductName"
                         tools:text="Vendor Name" />
 
@@ -110,6 +122,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:textSize="14sp"
+                        android:textColor="@color/text_secondary_light"
                         app:layout_constraintTop_toBottomOf="@id/tvVendor"
                         tools:text="Category: Electronics" />
 
@@ -118,9 +131,11 @@
                         android:id="@+id/tvPriceLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="20dp"
                         android:text="Price:"
                         android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary_light"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvCategory" />
 
@@ -129,8 +144,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:textColor="@android:color/holo_red_dark"
-                        android:textSize="18sp"
+                        android:textColor="@color/error"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@id/tvPriceLabel"
                         app:layout_constraintTop_toTopOf="@id/tvPriceLabel"
@@ -142,8 +157,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:textColor="@android:color/holo_red_light"
-                        android:textStyle="italic"
+                        android:textColor="@color/warning"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
                         app:layout_constraintTop_toBottomOf="@id/tvPrice"
                         tools:text="Special Promotion: 20% off" />
 
@@ -155,6 +171,8 @@
                         android:layout_marginTop="16dp"
                         android:text="Availability:"
                         android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary_light"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvPromotionDescription" />
 
@@ -163,6 +181,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:textColor="@color/success"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
                         app:layout_constraintStart_toEndOf="@id/tvAvailabilityLabel"
                         app:layout_constraintTop_toTopOf="@id/tvAvailabilityLabel"
                         tools:text="In Stock (15 available)" />
@@ -173,6 +194,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:textColor="@color/text_secondary_light"
+                        android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tvAvailabilityLabel"
                         tools:text="120 sold" />
@@ -201,13 +224,17 @@
                         android:text="Description"
                         android:textSize="18sp"
                         android:textStyle="bold"
+                        android:textColor="@color/text_primary_light"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_secondary_light"
+                        android:lineSpacingExtra="2dp"
                         app:layout_constraintTop_toBottomOf="@id/tvDescriptionTitle"
                         tools:text="This is a detailed description of the product..." />
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -235,6 +262,7 @@
                         android:text="Options"
                         android:textSize="18sp"
                         android:textStyle="bold"
+                        android:textColor="@color/text_primary_light"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -290,31 +318,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Qty:"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
-                    android:layout_marginEnd="4dp" />
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginEnd="6dp" />
 
                 <ImageButton
                     android:id="@+id/btnDecreaseQuantity"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Decrease quantity"
                     android:src="@android:drawable/ic_menu_revert" />
 
                 <TextView
                     android:id="@+id/tvQuantity"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="1"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
 
                 <ImageButton
                     android:id="@+id/btnIncreaseQuantity"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Increase quantity"
                     android:src="@android:drawable/ic_menu_add" />
@@ -339,8 +369,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="199,000 VND"
-                    android:textColor="#FF5722"
-                    android:textSize="16sp"
+                    android:textColor="@color/error"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -348,8 +378,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total: 199,000 VND"
-                    android:textColor="#666666"
-                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary_light"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -361,7 +392,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="12dp"
-            android:background="#FF5722"
+            android:background="@color/lime_green"
             android:text="🛒 ADD TO CART"
             android:textColor="@android:color/white"
             android:textSize="16sp"

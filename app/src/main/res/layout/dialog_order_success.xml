@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -12,15 +13,15 @@
         android:layout_height="80dp"
         android:layout_gravity="center"
         android:src="@drawable/ic_check_circle"
-        android:tint="@color/green_500"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        app:tint="@color/green_500" />
 
     <!-- Title -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Đặt hàng thành công!"
+        android:text="Order Placed Successfully!"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -31,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Đơn hàng của bạn đã được đặt thành công.\nBạn muốn làm gì tiếp theo?"
+        android:text="Your order has been placed successfully.\nWhat would you like to do next?"
         android:textSize="14sp"
         android:textColor="@color/gray_600"
         android:gravity="center"
@@ -49,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Về trang chủ"
+            android:text="Go to Home"
             android:textSize="14sp"
             android:backgroundTint="@color/gray_400"
             android:textColor="@android:color/white"
@@ -60,7 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Xem đơn hàng"
+            android:text="View Order"
             android:textSize="14sp"
             android:backgroundTint="@color/purple_500"
             android:textColor="@android:color/white"
